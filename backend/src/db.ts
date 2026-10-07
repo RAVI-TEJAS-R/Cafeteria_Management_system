@@ -112,7 +112,6 @@ class PgConnection {
   }
 
   async close() {
-    async close() {
   try {
     await this.client.query("ROLLBACK");
   } catch {
@@ -120,7 +119,6 @@ class PgConnection {
   }
 
   this.client.release();
-}
   }
 }
 
