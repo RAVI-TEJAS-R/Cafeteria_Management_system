@@ -1,0 +1,1 @@
+-- Constraints are defined in 01_tables.sql for PostgreSQL.

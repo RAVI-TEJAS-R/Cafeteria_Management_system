@@ -1,0 +1,5 @@
+-- PostgreSQL deployment note
+-- Database-side logic for Campus Cafeteria is installed by:
+--   database/schema/01_tables.sql
+-- The application uses PostgreSQL transactions and PL/pgSQL triggers instead
+-- of Oracle PL/SQL packages/procedures.
