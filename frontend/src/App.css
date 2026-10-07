@@ -1,0 +1,5 @@
+@import "./styles/global.css";
+@import "./styles/auth.css";
+@import "./styles/student.css";
+@import "./styles/staff.css";
+@import "./styles/admin.css";
