@@ -78,13 +78,13 @@ router.get(
             mi.description AS "description",
             mi.price AS "price",
             mi.is_available AS "isAvailable",
-            NVL(s.available_qty, 0) AS "stockQuantity"
+            COALESCE(s.available_qty, 0) AS "stockQuantity"
         FROM menu_dates md
         JOIN menu_items mi
           ON mi.menu_date_id = md.menu_date_id
         LEFT JOIN stock s
           ON s.menu_item_id = mi.menu_item_id
-        WHERE md.menu_date = TO_DATE(:menu_date, 'YYYY-MM-DD')
+        WHERE md.menu_date = CAST(:menu_date AS DATE)
           AND md.is_published = 'Y'
         ORDER BY mi.menu_item_id
         `,
@@ -104,7 +104,7 @@ router.get(
           ON mi.menu_item_id = ii.menu_item_id
         JOIN menu_dates md
           ON md.menu_date_id = mi.menu_date_id
-        WHERE md.menu_date = TO_DATE(:menu_date, 'YYYY-MM-DD')
+        WHERE md.menu_date = CAST(:menu_date AS DATE)
         ORDER BY ii.menu_item_id, i.ingredient_name
         `,
         { menu_date: date },
@@ -121,7 +121,7 @@ router.get(
             reserved_count AS "reservedCount",
             capacity - reserved_count AS "availableCapacity"
         FROM pickup_windows
-        WHERE window_date = TO_DATE(:menu_date, 'YYYY-MM-DD')
+        WHERE window_date = CAST(:menu_date AS DATE)
         ORDER BY start_time
         `,
         { menu_date: date },
@@ -259,7 +259,7 @@ router.post(
         `
         SELECT menu_date_id
         FROM menu_dates
-        WHERE menu_date = TO_DATE(:menu_date, 'YYYY-MM-DD')
+        WHERE menu_date = CAST(:menu_date AS DATE)
         `,
         {
           menu_date: menuDate,
@@ -282,7 +282,7 @@ router.post(
           is_published
         )
         VALUES (
-          TO_DATE(:menu_date, 'YYYY-MM-DD'),
+          CAST(:menu_date AS DATE),
           :is_published
         )
         `,
@@ -301,7 +301,7 @@ router.post(
           TO_CHAR(menu_date, 'YYYY-MM-DD') AS "menuDate",
           is_published AS "isPublished"
         FROM menu_dates
-        WHERE menu_date = TO_DATE(:menu_date, 'YYYY-MM-DD')
+        WHERE menu_date = CAST(:menu_date AS DATE)
         `,
         {
           menu_date: menuDate,
@@ -378,7 +378,7 @@ router.get(
             TO_CHAR(menu_date, 'YYYY-MM-DD') AS "menuDate",
             is_published AS "isPublished"
         FROM menu_dates
-        WHERE menu_date = TO_DATE(:menu_date, 'YYYY-MM-DD')
+        WHERE menu_date = CAST(:menu_date AS DATE)
         `,
         { menu_date: date },
         { outFormat: 4002 },
@@ -400,7 +400,7 @@ router.get(
             mi.description AS "description",
             mi.price AS "price",
             mi.is_available AS "isAvailable",
-            NVL(s.available_qty, 0) AS "stockQuantity"
+            COALESCE(s.available_qty, 0) AS "stockQuantity"
         FROM menu_items mi
         LEFT JOIN stock s
           ON s.menu_item_id = mi.menu_item_id
@@ -495,7 +495,7 @@ router.get(
         `
         SELECT menu_date_id
         FROM menu_dates
-        WHERE menu_date = TO_DATE(:menu_date, 'YYYY-MM-DD')
+        WHERE menu_date = CAST(:menu_date AS DATE)
         `,
         {
           menu_date: date,
@@ -521,7 +521,7 @@ router.get(
           reserved_count AS "reservedCount",
           capacity - reserved_count AS "availableCapacity"
         FROM pickup_windows
-        WHERE window_date = TO_DATE(:window_date, 'YYYY-MM-DD')
+        WHERE window_date = CAST(:window_date AS DATE)
         ORDER BY start_time
         `,
         {
@@ -599,7 +599,7 @@ router.post(
         `
         SELECT menu_date_id
         FROM menu_dates
-        WHERE menu_date = TO_DATE(:menu_date, 'YYYY-MM-DD')
+        WHERE menu_date = CAST(:menu_date AS DATE)
         `,
         {
           menu_date: menuDate,
@@ -619,9 +619,9 @@ router.post(
         `
         SELECT pickup_window_id
         FROM pickup_windows
-        WHERE window_date = TO_DATE(:window_date, 'YYYY-MM-DD')
-          AND start_time < TO_TIMESTAMP(:end_time, 'HH24:MI')
-          AND end_time > TO_TIMESTAMP(:start_time, 'HH24:MI')
+        WHERE window_date = CAST(:window_date AS DATE)
+          AND start_time < CAST(:end_time AS TIME)
+          AND end_time > CAST(:start_time AS TIME)
         `,
         {
           window_date: menuDate,
@@ -649,9 +649,9 @@ router.post(
           reserved_count
         )
         VALUES (
-          TO_DATE(:window_date, 'YYYY-MM-DD'),
-          TO_TIMESTAMP(:start_time, 'HH24:MI'),
-          TO_TIMESTAMP(:end_time, 'HH24:MI'),
+          CAST(:window_date AS DATE),
+          CAST(:start_time AS TIME),
+          CAST(:end_time AS TIME),
           :capacity,
           0
         )
@@ -797,10 +797,10 @@ router.patch(
         `
         SELECT pickup_window_id
         FROM pickup_windows
-        WHERE window_date = TO_DATE(:window_date, 'YYYY-MM-DD')
+        WHERE window_date = CAST(:window_date AS DATE)
           AND pickup_window_id <> :pickup_window_id
-          AND start_time < TO_TIMESTAMP(:end_time, 'HH24:MI')
-          AND end_time > TO_TIMESTAMP(:start_time, 'HH24:MI')
+          AND start_time < CAST(:end_time AS TIME)
+          AND end_time > CAST(:start_time AS TIME)
         `,
         {
           window_date: windowDate,
@@ -823,8 +823,8 @@ router.patch(
         `
         UPDATE pickup_windows
         SET
-          start_time = TO_TIMESTAMP(:start_time, 'HH24:MI'),
-          end_time = TO_TIMESTAMP(:end_time, 'HH24:MI'),
+          start_time = CAST(:start_time AS TIME),
+          end_time = CAST(:end_time AS TIME),
           capacity = :capacity
         WHERE pickup_window_id = :pickup_window_id
         `,
