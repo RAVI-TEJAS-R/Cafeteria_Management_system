@@ -79,6 +79,9 @@ class PgConnection {
     }
 
     const { sql: translated, values } = translateNamedBinds(sql, binds);
+    console.log("PG QUERY:", translated);
+    console.log("PG VALUES:", values);
+
     const result: QueryResult = await this.client.query(translated, values);
 
     const rows = options.outFormat === 4002
