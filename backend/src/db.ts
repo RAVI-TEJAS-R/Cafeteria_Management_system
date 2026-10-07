@@ -112,7 +112,15 @@ class PgConnection {
   }
 
   async close() {
-    this.client.release();
+    async close() {
+  try {
+    await this.client.query("ROLLBACK");
+  } catch {
+    // Ignore rollback errors while releasing the connection.
+  }
+
+  this.client.release();
+}
   }
 }
 
